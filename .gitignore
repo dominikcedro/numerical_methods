@@ -1,0 +1,22 @@
+# Exclude all .idea directories
+.idea/
+**/.idea/
+**/cmake-build-/debug/
+cmake-build-debug/
+
+
+# Exclude all binary files
+*.bin
+*.exe
+*.dll
+*.o
+*.so
+
+# Exclude all .png, .pdf, and .csv files
+*.png
+*.pdf
+*.csv
+
+#
+*.txt
+/Lab2/cmake-build-debug/
