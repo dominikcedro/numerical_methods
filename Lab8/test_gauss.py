@@ -7,14 +7,12 @@ description: Lab 8 - solving equations with naive Gauss elimination.
 import numpy as np
 from scipy.linalg import solve
 from gauss_elimination import naive_gauss_elimination
-# Coefficients of the equations
 A = np.array([
     [10, 2, -1],
     [4, 5, -2],
     [3, -1, 2]
 ], dtype=float)
 
-# Constants on the right-hand side
 b = np.array([27, 15, 10], dtype=float)
 
 def test_with_numpy(A,b):
