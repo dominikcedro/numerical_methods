@@ -5,6 +5,7 @@ description: Lab 9 - solving differntial equations with euler, midpoint and Rang
 """
 
 import math
+import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
 
@@ -15,110 +16,115 @@ def equation(x, y):
     return 4 * math.exp(0.8 * x) - (0.5 * y)
 
 
-
 def euler_method(f, x0, y0, h, x_end):
-    x, y = x0, y0
-    steps = 0
-    while x < x_end:
-        y += h * f(x, y)
-        x += h
-        if x >= x_end:
-            break
-        steps += 1
-    print(x)
-    return y, steps
+    """
+        function that uses euler's method for ordinary differential equations
 
+    :param f:
+    :param x0:
+    :param y0:
+    :param h:
+    :param x_end:
+    :return:
+    """
+    n_steps = int((x_end - x0) / h) + 1
+    x_values = np.linspace(x0, x_end, n_steps)
+    y_values = np.zeros(n_steps)
+    y_values[0] = y0
+    for i in range(1, n_steps):
+        y_values[i] = y_values[i-1] + h * f(x_values[i-1], y_values[i-1])
+    return x_values, y_values
 
 
 def midpoint_method(f, x0, y0, h, x_end):
-    x, y = x0, y0
-    steps = 0
-    while x < x_end:
-        k1 = h * f(x, y)
-        k2 = h * f(x + 0.5 * h, y + 0.5 * k1)
-        y += k2
-        x += h
-        if x >= x_end:
-            break
-        steps += 2
-    return y, steps
+    """
+        function that uses midpoint method for ordinary differential equations
+
+    :param f:
+    :param x0:
+    :param y0:
+    :param h:
+    :param x_end:
+    :return:
+    """
+    n_steps = int((x_end - x0) / h) + 1
+    x_values = np.linspace(x0, x_end, n_steps)
+    y_values = np.zeros(n_steps)
+    y_values[0] = y0
+    for i in range(1, n_steps):
+        k1 = f(x_values[i-1], y_values[i-1])
+        k2 = f(x_values[i-1] + h / 2, y_values[i-1] + h * k1 / 2)
+        y_values[i] = y_values[i-1] + h * k2
+    return x_values, y_values
 
 
-def runge_kutta_method(f, x0, y0, h, x_end):
-    x, y = x0, y0
-    steps = 0
-    while x < x_end:
-        k1 = h * f(x, y)
-        k2 = h * f(x + 0.5 * h, y + 0.5 * k1)
-        k3 = h * f(x + 0.5 * h, y + 0.5 * k2)
-        k4 = h * f(x + h, y + k3)
-        y += (k1 + 2 * k2 + 2 * k3 + k4) / 6
-        x += h
-        if x >= x_end:
-            break
-        steps += 4
-    return y, steps
+def rk4_method(f, x0, y0, h, x_end):
+    """
+    function that uses runge kutta method for ordinary differential equations
+    :param f:
+    :param x0:
+    :param y0:
+    :param h:
+    :param x_end:
+    :return:
+    """
+
+    n_steps = int((x_end - x0) / h) + 1
+    x_values = np.linspace(x0, x_end, n_steps)
+    y_values = np.zeros(n_steps)
+    y_values[0] = y0
+    for i in range(1, n_steps):
+        k1 = f(x_values[i-1], y_values[i-1])
+        k2 = f(x_values[i-1] + h / 2, y_values[i-1] + h * k1 / 2)
+        k3 = f(x_values[i-1] + h / 2, y_values[i-1] + h * k2 / 2)
+        k4 = f(x_values[i-1] + h, y_values[i-1] + h * k3)
+        y_values[i] = y_values[i-1] + h * (k1 + 2 * k2 + 2 * k3 + k4) / 6
+    return x_values, y_values
 
 
 x = sp.symbols('x')
-y = sp.Function('y')(x)
-differential_eq = sp.Eq(y.diff(x), 4 * sp.exp(0.8 * x) - 0.5 * y)
+y = sp.Function('y')
 
-solution = sp.dsolve(differential_eq, y)
+func = 4 * sp.exp(0.8 * x) - 0.5 * y(x)
+differential_eq = sp.Eq(y(x).diff(x), func)
+initial_condition = {y(0): 2}
+particular_solution = sp.dsolve(differential_eq, y(x), ics=initial_condition)
+analytical_solution = particular_solution.subs(x, 4).rhs
+print(f"Analytical solution at x = 4: {analytical_solution}")
+exact_value = analytical_solution
 
-C1 = sp.symbols('C1')
-initial_condition = solution.rhs.subs({x: 0, y: 2})
-C1_value = sp.solve(initial_condition, C1)[0]
-particular_solution = solution.rhs.subs(C1, C1_value)
-exact_value = particular_solution.subs(x, 4).evalf()
-print(f'The correct analytical solution at x = 4 is: {exact_value}')
-analytical_up = 2 * (20 * math.exp(26/5) - 7)
-analytical_dwn = 13 * math.exp(2)
-exact_value = analytical_up/analytical_dwn
-print(f'The correct analytical solution at x = 4 is: {exact_value}')
 
-x0 = 0
-y0 = 2
-x_end = 4
-
-h_values = [0.1, 0.01, 0.001, 0.0001]
-errors_euler = []
-errors_modified_euler = []
-errors_runge_kutta = []
-costs_euler = []
-costs_modified_euler = []
-costs_runge_kutta = []
+h_values = np.logspace(-1, -5, 5)
+methods = [euler_method, midpoint_method, rk4_method]
+method_names = ['Euler', 'Midpoint', 'RK4']
+results = []
 
 for h in h_values:
-    y_euler, steps_euler = euler_method(equation, x0, y0, h, x_end)
-    y_modified_euler, steps_modified_euler = midpoint_method(equation, x0, y0, h, x_end)
-    y_runge_kutta, steps_runge_kutta = runge_kutta_method(equation, x0, y0, h, x_end)
+    for method, name in zip(methods, method_names):
+        x_values, y_values = method(equation, 0, 2, h, 4)
+        computational_cost = len(y_values) * (1 if name == 'Euler' else 2 if name == 'Midpoint' else 4)
+        relative_error = abs(y_values[-1] - exact_value) / exact_value
+        results.append({
+            'method_name': name,
+            'computational_cost': computational_cost,
+            'h_value': h,
+            'relative_error': relative_error
+        })
 
-    error_euler = abs((y_euler - exact_value) / exact_value)
-    error_modified_euler = abs((y_modified_euler - exact_value) / exact_value)
-    error_runge_kutta = abs((y_runge_kutta - exact_value) / exact_value)
+# I will use dataframe to store and operate on results
+import pandas as pd
+df = pd.DataFrame(results)
+print(df)
 
-    errors_euler.append(error_euler)
-    errors_modified_euler.append(error_modified_euler)
-    errors_runge_kutta.append(error_runge_kutta)
-
-    costs_euler.append(steps_euler)
-    costs_modified_euler.append(steps_modified_euler)
-    costs_runge_kutta.append(steps_runge_kutta)
-
-
+# Plot the results
 plt.figure(figsize=(10, 6))
-plt.plot(costs_euler, errors_euler, marker='o', linestyle='-', color='r', label="Euler's Method")
-plt.plot(costs_modified_euler, errors_modified_euler, marker='s', linestyle='--', color='b', label="Midpoint Method")
-plt.plot(costs_runge_kutta, errors_runge_kutta, marker='^', linestyle='-.', color='g', label="Runge-Kutta Method")
+for name in method_names:
+    method_results = df[df['method_name'] == name]
+    plt.plot(method_results['computational_cost'], method_results['relative_error'], 'o-', label=name)
+plt.xlabel('Computational Cost')
+plt.ylabel('Relative Error')
 plt.xscale('log')
 plt.yscale('log')
-plt.xlabel('Computational Cost (Number of Function Evaluations)')
-plt.ylabel('Relative Error')
-plt.title('Log-Log Plot of Relative Error vs Computational Cost')
-plt.grid(True)
+plt.title('Error vs. Computational Cost')
 plt.legend()
 plt.show()
-
-y_euler, steps_euler = euler_method(equation, x0, y0, 1, x_end)
-print(y_euler,steps_euler)
