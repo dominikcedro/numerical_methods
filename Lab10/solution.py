@@ -3,6 +3,8 @@ author: Dominik Cedro
 date: 07.12.2024
 description: Utilizing Verlet algorythm in Newtonian equations.
 """
+import os
+
 import numdifftools as nd
 import numpy as np
 from icecream import ic
@@ -78,58 +80,74 @@ def verlet_algorithm(x_0, v_0, m, delta_t, time_range):
 x_0 = 2
 v_0 = 0
 m = 1
-delta_t = 0.01
+delta_t_values = [0.01, 0.05, 0.1]
 time_range = 10
+for delta_t in delta_t_values:
+    results = verlet_algorithm(x_0, v_0, m, delta_t, time_range)
+    time_list, position_list, velocity_list, kinetic_e_list, potential_e_list, total_e_list = results
 
-results = verlet_algorithm(x_0, v_0, m, delta_t, time_range)
-time_list, position_list, velocity_list, kinetic_e_list, potential_e_list, total_e_list = results
+    # Plot position as a function of time
+    plt.figure(figsize=(10, 6))
+    plt.plot(time_list, position_list, label='Position', color='blue')
+    plt.xlabel('Time')
+    plt.ylabel('Position')
+    plt.title(f'Position vs Time (delta_t={delta_t})')
+    plt.grid(True)
+    plt.legend()
+    plt.savefig(os.path.join('plots', f'position_vs_time_dt_{delta_t}.png'))
+    plt.close()
 
-# Plot position as a function of time
-plt.figure(figsize=(10, 6))
-plt.plot(time_list, position_list, label='Position', color='blue')
-plt.xlabel('Time')
-plt.ylabel('Position')
-plt.title('Position vs Time')
-plt.grid(True)
-plt.legend()
-plt.show()
+    # Plot velocity as a function of time
+    plt.figure(figsize=(10, 6))
+    plt.plot(time_list, velocity_list, label='Velocity', color='green')
+    plt.xlabel('Time')
+    plt.ylabel('Velocity')
+    plt.title(f'Velocity vs Time (delta_t={delta_t})')
+    plt.grid(True)
+    plt.legend()
+    plt.savefig(os.path.join('plots', f'velocity_vs_time_dt_{delta_t}.png'))
+    plt.close()
 
-# Plot velocity as a function of time
-plt.figure(figsize=(10, 6))
-plt.plot(time_list, velocity_list, label='Velocity', color='green')
-plt.xlabel('Time')
-plt.ylabel('Velocity')
-plt.title('Velocity vs Time')
-plt.grid(True)
-plt.legend()
-plt.show()
+    # Plot kinetic energy as a function of time
+    plt.figure(figsize=(10, 6))
+    plt.plot(time_list, kinetic_e_list, label='Kinetic Energy', color='red')
+    plt.xlabel('Time')
+    plt.ylabel('Kinetic Energy')
+    plt.title(f'Kinetic Energy vs Time (delta_t={delta_t})')
+    plt.grid(True)
+    plt.legend()
+    plt.savefig(os.path.join('plots', f'kinetic_energy_vs_time_dt_{delta_t}.png'))
+    plt.close()
 
-# Plot kinetic energy as a function of time
-plt.figure(figsize=(10, 6))
-plt.plot(time_list, kinetic_e_list, label='Kinetic Energy', color='red')
-plt.xlabel('Time')
-plt.ylabel('Kinetic Energy')
-plt.title('Kinetic Energy vs Time')
-plt.grid(True)
-plt.legend()
-plt.show()
+    # Plot potential energy as a function of time
+    plt.figure(figsize=(10, 6))
+    plt.plot(time_list, potential_e_list, label='Potential Energy', color='purple')
+    plt.xlabel('Time')
+    plt.ylabel('Potential Energy')
+    plt.title(f'Potential Energy vs Time (delta_t={delta_t})')
+    plt.grid(True)
+    plt.legend()
+    plt.savefig(os.path.join('plots', f'potential_energy_vs_time_dt_{delta_t}.png'))
+    plt.close()
 
-# Plot potential energy as a function of time
-plt.figure(figsize=(10, 6))
-plt.plot(time_list, potential_e_list, label='Potential Energy', color='purple')
-plt.xlabel('Time')
-plt.ylabel('Potential Energy')
-plt.title('Potential Energy vs Time')
-plt.grid(True)
-plt.legend()
-plt.show()
+    # Plot total energy as a function of time
+    plt.figure(figsize=(10, 6))
+    plt.plot(time_list, total_e_list, label='Total Energy', color='orange')
+    plt.xlabel('Time')
+    plt.ylabel('Total Energy')
+    plt.title(f'Total Energy vs Time (delta_t={delta_t})')
+    plt.grid(True)
+    plt.legend()
+    plt.savefig(os.path.join('plots', f'total_energy_vs_time_dt_{delta_t}.png'))
+    plt.close()
 
-# Plot total energy as a function of time
-plt.figure(figsize=(10, 6))
-plt.plot(time_list, total_e_list, label='Total Energy', color='orange')
-plt.xlabel('Time')
-plt.ylabel('Total Energy')
-plt.title('Total Energy vs Time')
-plt.grid(True)
-plt.legend()
-plt.show()
+    # Plot phase plot: x(t) vs v(t)
+    plt.figure(figsize=(10, 6))
+    plt.plot(position_list, velocity_list, label='Phase Plot', color='black')
+    plt.xlabel('Position')
+    plt.ylabel('Velocity')
+    plt.title(f'Phase Plot (delta_t={delta_t})')
+    plt.grid(True)
+    plt.legend()
+    plt.savefig(os.path.join('plots', f'phase_plot_dt_{delta_t}.png'))
+    plt.close()
