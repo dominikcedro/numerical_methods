@@ -20,3 +20,6 @@ cmake-build-debug/
 #
 *.txt
 /Lab2/cmake-build-debug/
+
+# Folder with instructions should be excluded
+/instructions/
