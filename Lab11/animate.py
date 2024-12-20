@@ -28,8 +28,7 @@ def animate_three_body():
     colors = ['red', 'blue', 'green']
     particles = [ax.plot([], [], 'o', color=c, markersize=10, label=f'Particle {i+1}')[0]
                  for i, c in enumerate(colors)]
-    trails = [ax.plot([], [], '-', color=c, alpha=0.3)[0]
-              for c in colors]
+    trails = [ax.plot([], [], '-', color=c, alpha=0.5)[0] for c in colors]
 
     ax.legend()
     plt.title('Three-Body Problem')
@@ -45,16 +44,11 @@ def animate_three_body():
 
     def update(frame):
         """Update animation"""
-        for i, (particle, trail) in enumerate(zip(particles, trails)):
-            if i == 0:
-                particle.set_data([x1[frame]], [y1[frame]])
-                trail.set_data(x1[:frame+1], y1[:frame+1])
-            elif i == 1:
-                particle.set_data([x2[frame]], [y2[frame]])
-                trail.set_data(x2[:frame+1], y2[:frame+1])
-            elif i == 2:
-                particle.set_data([x3[frame]], [y3[frame]])
-                trail.set_data(x3[:frame+1], y3[:frame+1])
+        trail_length = 50  # Length of the trail
+        for i, (particle, trail, x, y) in enumerate(zip(particles, trails, [x1, x2, x3], [y1, y2, y3])):
+            particle.set_data([x[frame]], [y[frame]])
+            start = max(0, frame - trail_length)
+            trail.set_data(x[start:frame], y[start:frame])
         return particles + trails
 
     anim = FuncAnimation(fig, update, frames=len(t),

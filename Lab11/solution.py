@@ -44,15 +44,28 @@ def three_body_system(t, y, G, m1, m2, m3):
 G = 1
 m1 = 1
 m2 = 1
-m3 = 1
+m3 = 0.1
 
 initial_positions = [-0.97000436, 0.24308753, 0, 0, 0.97000436, -0.24308753]
 initial_velocities = [0.466203685, 0.432365730, -0.93240737, -0.86473146, 0.466203685, 0.432365730]
+
+initial_positions2 = [-1, 0, 0, 0, 1, 0 ]
+initial_velocities2 = [0, 0.3, 0, -0.6, 0, 0.3]
+
+initial_positions3 = [-1, 0, 0.5, 0.866, 0.5, -0.866 ]
+initial_velocities3 = [0, -0.5, -0.433, -0.25, 0.433, -0.25]
+
+initial_positions4 = [-0.5, 0, 0.5, 0, 0, 0 ]
+initial_velocities4 = [0, -0.6, 0, 0.6, 0.3, 0]
+
 y0 = initial_positions + initial_velocities
+y0_2 = initial_positions2 + initial_velocities2
+y0_3 = initial_positions3 + initial_velocities3
+y0_4 = initial_positions4 + initial_velocities4
 
 t_span = [0, 20]
 t_eval = np.linspace(0, 20, 1000)
 
-solution = solve_ivp(three_body_system, t_span, y0, t_eval=t_eval, args=(G, m1, m2, m3), rtol=1e-10, atol=1e-10)
+solution = solve_ivp(three_body_system, t_span, y0_4, t_eval=t_eval, args=(G, m1, m2, m3), rtol=1e-10, atol=1e-10)
 
 np.savez('three_body_solution.npz', t=solution.t, y=solution.y)
