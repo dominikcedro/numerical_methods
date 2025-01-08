@@ -1,31 +1,8 @@
-"""
-author: Dominik Cedro
-date: 18.12.2024
-description: File contains logic to perform three body problem calculations.
-"""
-
 import numpy as np
 from scipy.integrate import solve_ivp
+import matplotlib.pyplot as plt
 
 def three_body_system(t, y, G, m1, m2, m3):
-    """
-    Defines the system of differential equations for the three-body problem.
-
-    :param t: Time variable.
-    :type t: float
-    :param y: Array containing positions and velocities of the three bodies.
-    :type y: list of float
-    :param G: Gravitational constant.
-    :type G: float
-    :param m1: Mass of the first body.
-    :type m1: float
-    :param m2: Mass of the second body.
-    :type m2: float
-    :param m3: Mass of the third body.
-    :type m3: float
-    :return: Derivatives of positions and velocities.
-    :rtype: list of float
-    """
     x1, y1, x2, y2, x3, y3, vx1, vy1, vx2, vy2, vx3, vy3 = y
 
     r12 = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
@@ -41,31 +18,73 @@ def three_body_system(t, y, G, m1, m2, m3):
 
     return [vx1, vy1, vx2, vy2, vx3, vy3, ax1, ay1, ax2, ay2, ax3, ay3]
 
-G = 1
-m1 = 1
-m2 = 1
-m3 = 0.1
-
-initial_positions = [-0.97000436, 0.24308753, 0, 0, 0.97000436, -0.24308753]
-initial_velocities = [0.466203685, 0.432365730, -0.93240737, -0.86473146, 0.466203685, 0.432365730]
-
-initial_positions2 = [-1, 0, 0, 0, 1, 0 ]
-initial_velocities2 = [0, 0.3, 0, -0.6, 0, 0.3]
-
-initial_positions3 = [-1, 0, 0.5, 0.866, 0.5, -0.866 ]
-initial_velocities3 = [0, -0.5, -0.433, -0.25, 0.433, -0.25]
-
-initial_positions4 = [-0.5, 0, 0.5, 0, 0, 0 ]
-initial_velocities4 = [0, -0.6, 0, 0.6, 0.3, 0]
-
-y0 = initial_positions + initial_velocities
-y0_2 = initial_positions2 + initial_velocities2
-y0_3 = initial_positions3 + initial_velocities3
-y0_4 = initial_positions4 + initial_velocities4
+# Define initial conditions and parameters for each scenario
+scenarios = [
+    {
+        "name": "Figure-8",
+        "G": 1,
+        "masses": [1, 1, 1],
+        "initial_positions": [-0.97000436, 0.24308753, 0, 0, 0.97000436, -0.24308753],
+        "initial_velocities": [0.466203685, 0.432365730, -0.93240737, -0.86473146, 0.466203685, 0.432365730]
+    },
+    {
+        "name": "Euler",
+        "G": 1,
+        "masses": [1, 1, 1],
+        "initial_positions": [-1, 0, 0, 0, 1, 0],
+        "initial_velocities": [0, 0.3, 0, -0.6, 0, 0.3]
+    },
+    {
+        "name": "Lagrange",
+        "G": 1,
+        "masses": [1, 1, 4],
+        "initial_positions": [-1, 0, 0.5, 0.866, 0.5, -0.866],
+        "initial_velocities": [0, -0.5, -0.433, -0.25, 0.433, -0.25]
+    },
+    {
+        "name": "Sitnikov",
+        "G": 1,
+        "masses": [1, 1, 4],
+        "initial_positions": [-0.5, 0, 0.5, 0, 0, 0],
+        "initial_velocities": [0, -0.6, 0, 0.6, 0.3, 0]
+    }
+]
 
 t_span = [0, 20]
 t_eval = np.linspace(0, 20, 1000)
 
-solution = solve_ivp(three_body_system, t_span, y0_4, t_eval=t_eval, args=(G, m1, m2, m3), rtol=1e-10, atol=1e-10)
+# Solve and save solutions for each scenario
+for scenario in scenarios:
+    G = scenario["G"]
+    m1, m2, m3 = scenario["masses"]
+    y0 = scenario["initial_positions"] + scenario["initial_velocities"]
 
-np.savez('three_body_solution.npz', t=solution.t, y=solution.y)
+    solution = solve_ivp(three_body_system, t_span, y0, t_eval=t_eval, args=(G, m1, m2, m3), rtol=1e-10, atol=1e-10)
+    np.savez(f'three_body_solution_{scenario["name"]}.npz', t=solution.t, y=solution.y)
+
+# Plot solutions
+fig, axes = plt.subplots(2, 2, figsize=(12, 12))
+axes = axes.flatten()
+
+for i, scenario in enumerate(scenarios):
+    data = np.load(f'three_body_solution_{scenario["name"]}.npz')
+    t = data['t']
+    y = data['y']
+
+    x1, y1 = y[0], y[1]
+    x2, y2 = y[2], y[3]
+    x3, y3 = y[4], y[5]
+
+    ax = axes[i]
+    ax.plot(x1, y1, label='Body 1', color='red')
+    ax.plot(x2, y2, label='Body 2', color='blue')
+    ax.plot(x3, y3, label='Body 3', color='green')
+    ax.set_title(scenario["name"])
+    ax.set_xlabel('X Position')
+    ax.set_ylabel('Y Position')
+    ax.legend()
+    ax.grid(True)
+    ax.set_aspect('equal')
+
+plt.tight_layout()
+plt.show()
