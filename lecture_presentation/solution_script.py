@@ -16,7 +16,7 @@ from sklearn.pipeline import make_pipeline
 
 
 def activate_polynomial(degree, ax):
-    df = pd.read_csv('polynomial-regression.csv')
+    df = pd.read_csv('../../NumericalMethodsPresentation/polynomial-regression.csv')
     X = df.drop(columns=['araba_max_hiz'])
     y = df['araba_max_hiz']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -35,7 +35,7 @@ def activate_polynomial(degree, ax):
 
 
 fig, ax = plt.subplots()
-df = pd.read_csv('polynomial-regression.csv')
+df = pd.read_csv('../../NumericalMethodsPresentation/polynomial-regression.csv')
 X = df.drop(columns=['araba_max_hiz'])
 y = df['araba_max_hiz']
 ax.scatter(X, y, color='blue', label='Actual')

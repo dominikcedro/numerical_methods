@@ -12,7 +12,7 @@ def equations(t, y, m1, m2):
     x1, y1, x2, y2, vx1, vy1, vx2, vy2 = y
     r = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
     force = Force_calculations(r)
-    ax1 = force * (x2 - x1) /r
+    ax1 = force * (x2 - x1) /r1
     ay1 = force * (y2 - y1)/r
     ax2 = -force * (x2 - x1) /r
     ay2 = -force * (y2 - y1) /r
@@ -22,7 +22,7 @@ def equations(t, y, m1, m2):
 
 x1_0, y1_0 = -1.0, 0.0
 vx1_0, vy1_0 = 0.0, 0.0
-x2_0, y2_0 = 1.0, 1.0
+x2_0, y2_0 = 1.0, 0.0
 vx2_0, vy2_0 = 0.0, 0.0
 m1, m2 = 2.0, 2.0
 y0 = [x1_0, y1_0, x2_0, y2_0, vx1_0, vy1_0, vx2_0, vy2_0]
