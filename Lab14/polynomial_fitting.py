@@ -1,4 +1,3 @@
-# File: polynomial_fitting.py
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import chi2
@@ -69,7 +68,7 @@ def main():
 
     best_order_aic = orders[np.argmin(aic_values)]
     best_order_bic = orders[np.argmin(bic_values)]
-    best_order_llr = orders[np.argmax(np.array(p_values) < 0.05) + 1]
+    best_order_llr = orders[np.argmax(np.array(p_values) < 0.05) + 1] if any(np.array(p_values) < 0.05) else orders[0]
     best_order_mse = orders[np.argmin(mse_values)]
 
     print(f"Best order based on AIC: {best_order_aic}")
@@ -79,7 +78,7 @@ def main():
 
     plt.scatter(x, y, label='Data with noise')
     plt.plot(x, y_true, label='True polynomial', color='black')
-    for order in [best_order_aic, best_order_bic, best_order_llr, best_order_mse]:
+    for order in set([best_order_aic, best_order_bic, best_order_llr, best_order_mse]):
         y_fit, _ = fit_polynomial(x, y, order)
         plt.plot(x, y_fit, label=f'Fitted polynomial order {order}')
     plt.legend()
